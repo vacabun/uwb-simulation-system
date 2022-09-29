@@ -25,5 +25,20 @@
         <y>10.0</y>
         <z>0.0</z>
     </anthor>
+    <anthor id = "6">
+        <x>15.0</x>
+        <y>15.0</y>
+        <z>0.0</z>
+    </anthor>
+    <anthor id = "7">
+        <x>20.0</x>
+        <y>15.0</y>
+        <z>0.0</z>
+    </anthor>
+    <anthor id = "6">
+        <x>15.0</x>
+        <y>20.0</y>
+        <z>0.0</z>
+    </anthor>
 
 </anthors>

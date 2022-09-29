@@ -20,24 +20,32 @@ void UWBLocate::topic_callback(const uwb_interfaces::msg::UWBData::SharedPtr msg
     for (long unsigned int i = 0; i < msg->distances.size(); i++)
     {
         uwbDistance[msg->distances[i].anthor_id] = msg->distances[i].distance;
+
     }
     
     Position3D estimatedRes;
 
     std::unordered_map<int, Position3D> anthorPoseMap_;
     for(auto it : anthorPoseMap){
-        anthorPoseMap_[it.first].x = anthorPoseMap[it.first].x;
-        anthorPoseMap_[it.first].y = anthorPoseMap[it.first].y;
-        anthorPoseMap_[it.first].z = anthorPoseMap[it.first].z;
+        int id = it.first;
+        // RCLCPP_INFO(this->get_logger(), "id %d", id);
+        Position3D p;
+        p.x = (double)anthorPoseMap[id].x;
+        p.y = (double)anthorPoseMap[id].y;
+        p.z = (double)anthorPoseMap[id].z;
+        anthorPoseMap_[id] = p;
+        // RCLCPP_INFO(this->get_logger(), "%f %f %f", anthorPoseMap_[id].x, anthorPoseMap_[id].y, anthorPoseMap_[id].z);
     }
-
-    if (CALCULATE_SUCCESS == calculate_pos_robust_ransac(anthorPoseMap_, uwbDistance, estimatedRes))
+    LOCATOR_RETURN calState;
+    calState = calculate_pos_robust_ransac(anthorPoseMap_, uwbDistance, estimatedRes);
+    if (calState == CALCULATE_SUCCESS)
     {
-        RCLCPP_INFO(this->get_logger(), "uwb location res: x: %f, y: %f", estimatedRes.x, estimatedRes.y);
+        RCLCPP_INFO(this->get_logger(), "uwb location success %d . res: x: %f, y: %f", calState, estimatedRes.x, estimatedRes.y);
     }
     else
     {
-        RCLCPP_INFO(this->get_logger(), "uwb location failed.");
+        // RCLCPP_INFO(this->get_logger(), "%d", CALCULATE_SUCCESS);
+        RCLCPP_INFO(this->get_logger(), "uwb location failed %d . res: x: %f, y: %f",calState, estimatedRes.x, estimatedRes.y);
     }
 }
 

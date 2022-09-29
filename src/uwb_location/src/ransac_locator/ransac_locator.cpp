@@ -107,16 +107,15 @@ LOCATOR_RETURN calculate_pos_robust_ransac(std::unordered_map<int, Position3D> a
         {
             return CALCULATE_SUCCESS;
         }
-        else{
+        else
+        {
             return FIT_FAILED;
         }
-        
     }
-
 }
 
-LOCATOR_RETURN calculate_pos_for_all_(const std::unordered_map<int, Position3D> anthorPoseMap,
-                                      const std::unordered_map<int, double> distances,
+LOCATOR_RETURN calculate_pos_for_all_(std::unordered_map<int, Position3D> anthorPoseMap,
+                                      std::unordered_map<int, double> distances,
                                       Position3D &res)
 {
     std::vector<int> effective_landmark_indexes;
@@ -134,7 +133,7 @@ LOCATOR_RETURN calculate_pos_with_index_(std::unordered_map<int, Position3D> ant
                                          std::vector<int> effective_landmark_indexes,
                                          Position3D &res)
 {
-    if (is_landmarks_in_one_line(anthorPoseMap, effective_landmark_indexes) == ANTHOR_ON_ONE_LINE)
+    if (is_landmarks_in_one_line(anthorPoseMap, effective_landmark_indexes))
     {
         // all landmarks in one line, cannot locate the position.
         return ANTHOR_ON_ONE_LINE;
@@ -198,25 +197,28 @@ LOCATOR_RETURN calculate_pos_with_index_(std::unordered_map<int, Position3D> ant
     return CALCULATE_SUCCESS;
 }
 
-LOCATOR_RETURN
+bool
 is_landmarks_in_one_line(std::unordered_map<int, Position3D> anthorPoseMap,
-                         const std::vector<int> effective_landmark_indexes)
+                         std::vector<int> effective_landmark_indexes)
 {
-    double angle_0 = angle_normalize(atan2(anthorPoseMap[effective_landmark_indexes[0]].y -
-                                               anthorPoseMap[effective_landmark_indexes[effective_landmark_indexes.size() - 1]].y,
-                                           anthorPoseMap[effective_landmark_indexes[0]].x -
-                                               anthorPoseMap[effective_landmark_indexes[effective_landmark_indexes.size() - 1]].x));
+    int index_0 = effective_landmark_indexes[0];
+
+    int index_last = effective_landmark_indexes[effective_landmark_indexes.size() - 1];
+
+    double angle_0 = angle_normalize(atan2(anthorPoseMap[index_0].y - anthorPoseMap[index_last].y,
+                                           anthorPoseMap[index_0].x - anthorPoseMap[index_last].x));
 
     for (int i = 1; i < effective_landmark_indexes.size() - 1; i++)
     {
-        double angle_i = angle_normalize(atan2(anthorPoseMap[effective_landmark_indexes[i]].y - anthorPoseMap[effective_landmark_indexes[effective_landmark_indexes.size() - 1]].y,
-                                               anthorPoseMap[effective_landmark_indexes[i]].x - anthorPoseMap[effective_landmark_indexes[effective_landmark_indexes.size() - 1]].x));
+        int index_i = effective_landmark_indexes[i];
+        double angle_i = angle_normalize(atan2(anthorPoseMap[index_i].y - anthorPoseMap[index_last].y,
+                                               anthorPoseMap[index_i].x - anthorPoseMap[index_last].x));
         if (!fequal(angle_0, angle_i))
         {
-            return ANTHOR_ON_ONE_LINE;
+            return false;
         }
     }
-    return ANTHOR_NOT_ON_ONE_LINE;
+    return true;
 }
 
 bool get_sample_indexes_(std::vector<int> indexes,

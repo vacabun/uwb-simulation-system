@@ -8,6 +8,7 @@
 #include <string.h>
 #include <assert.h>
 
+
 #include <unordered_map>
 #include <unordered_set>
 
@@ -30,12 +31,11 @@ typedef struct
 
 enum LOCATOR_RETURN
 {
+    CALCULATE_SUCCESS,
     EFFECTIVE_LANDMARK_TOO_SMALL,
     EFFECTIVE_LANDMARK_LESS_2,
-    ANTHOR_NOT_ON_ONE_LINE,
     ANTHOR_ON_ONE_LINE,
     CONDITIONAL_NUMBER_TOO_LARGE,
-    CALCULATE_SUCCESS,
     FIT_FAILED
 
 };
@@ -59,7 +59,7 @@ calculate_pos_with_index_(std::unordered_map<int, Position3D> anthorPoseMap,
                           std::unordered_map<int, double> distances,
                           std::vector<int> effective_landmark_indexes,
                           Position3D &res);
-LOCATOR_RETURN
+bool
 is_landmarks_in_one_line(std::unordered_map<int, Position3D> anthorPoseMap,
                          std::vector<int> effective_landmark_indexes);
 
