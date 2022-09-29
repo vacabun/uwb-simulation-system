@@ -8,9 +8,12 @@
 #include <string.h>
 #include <assert.h>
 
-
+#include <unordered_map>
+#include <unordered_set>
 
 #include <gsl/gsl_multifit.h>
+
+#include "nav_msgs/msg/odometry.hpp"
 
 #define RANSAC_LEAST_CNT 4
 #define CALCULABLE_LEAST_CNT 3
@@ -22,15 +25,54 @@ typedef struct
 {
     double x;
     double y;
-} Position2D;
+    double z;
+} Position3D;
+
+enum LOCATOR_RETURN
+{
+    EFFECTIVE_LANDMARK_TOO_SMALL,
+    EFFECTIVE_LANDMARK_LESS_2,
+    ANTHOR_NOT_ON_ONE_LINE,
+    ANTHOR_ON_ONE_LINE,
+    CONDITIONAL_NUMBER_TOO_LARGE,
+    CALCULATE_SUCCESS,
+    FIT_FAILED
+
+};
 
 double angle_normalize(double angle);
-bool fequal(double f1, double f2);
-bool is_landmarks_in_one_line(const Position2D landmarks[], const int effective_landmark_indexes[], int effective_landmark_num);
-bool calculate_pos_with_index_(const Position2D landmarks[], const double distances[], const int effective_landmark_indexes[], int effective_landmark_num, double *x_out, double *y_out);
-bool calculate_pos_for_all_(const Position2D landmarks[], const double distances[], int effective_landmark_num, double *x_out, double *y_out);
-bool getSampleIndexes(int index_size, int sample_indexes[], int each_sample_cnt);
-int get_all_fit_indexes(const Position2D landmarks[], const double distances[], int effective_landmark_num, const int sample_indexes[], int sample_size, double x, double y, double threshold, int all_fit_indexes_out[], double *total_residual_out);
-bool calculate_pos_robust_ransac(const Position2D landmarks[], const double distances[], int effective_landmark_num, double *x_out, double *y_out);
 
-#endif // RANSAC_LOCATOR_H
+bool fequal(double f1, double f2);
+
+LOCATOR_RETURN
+calculate_pos_robust_ransac(std::unordered_map<int, Position3D> anthorPoseMap,
+                            std::unordered_map<int, double> distances,
+                            Position3D &res);
+
+LOCATOR_RETURN
+calculate_pos_for_all_(std::unordered_map<int, Position3D> anthorPoseMap,
+                       std::unordered_map<int, double> distances,
+                       Position3D &res);
+
+LOCATOR_RETURN
+calculate_pos_with_index_(std::unordered_map<int, Position3D> anthorPoseMap,
+                          std::unordered_map<int, double> distances,
+                          std::vector<int> effective_landmark_indexes,
+                          Position3D &res);
+LOCATOR_RETURN
+is_landmarks_in_one_line(std::unordered_map<int, Position3D> anthorPoseMap,
+                         std::vector<int> effective_landmark_indexes);
+
+bool get_sample_indexes_(std::vector<int> indexes,
+                         std::vector<int> &sample_indexes,
+                         int each_sample_cnt);
+
+void get_all_fit_indexes_(std::unordered_map<int, Position3D> anthorPoseMap,
+                         std::unordered_map<int, double> distances,
+                         std::vector<int> sample_indexes,
+                         Position3D p,
+                         double threshold,
+                         std::vector<int> &all_fit_indexes_out,
+                         double &total_residual_out);
+                         
+#endif // RANSAC_LOCATOR

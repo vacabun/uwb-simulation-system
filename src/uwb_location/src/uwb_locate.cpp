@@ -17,33 +17,23 @@ void UWBLocate::topic_callback(const uwb_interfaces::msg::UWBData::SharedPtr msg
     // int64_t id = msg->robot_id;
 
     std::unordered_map<int, double> uwbDistance;
-    for (int i = 0; i < msg->distances.size(); i++)
+    for (long unsigned int i = 0; i < msg->distances.size(); i++)
     {
         uwbDistance[msg->distances[i].anthor_id] = msg->distances[i].distance;
     }
+    
+    Position3D estimatedRes;
 
-    Position2D landmarks[5];
-    double distances[5];
-
-    for (int i = 0; i < 5; i++)
-    {
-        distances[msg->distances[i].anthor_id-1] = msg->distances[i].distance;
-        landmarks[msg->distances[i].anthor_id-1].x = anthorPoseMap[msg->distances[i].anthor_id].x;
-        landmarks[msg->distances[i].anthor_id-1].y = anthorPoseMap[msg->distances[i].anthor_id].y;
+    std::unordered_map<int, Position3D> anthorPoseMap_;
+    for(auto it : anthorPoseMap){
+        anthorPoseMap_[it.first].x = anthorPoseMap[it.first].x;
+        anthorPoseMap_[it.first].y = anthorPoseMap[it.first].y;
+        anthorPoseMap_[it.first].z = anthorPoseMap[it.first].z;
     }
 
-    // for (int i = 0; i < 5; i++)
-    // {
-    //     RCLCPP_INFO(this->get_logger(), "anthor id %d, distance %f", msg->distances[i].anthor_id, msg->distances[i].distance);
-    //     // distances[msg->distances[i].anthor_id] = msg->distances[i].distance;
-    //     // landmarks[msg->distances[i].anthor_id].x  = anthorPoseMap[msg->distances[i].anthor_id].x;
-    //     // landmarks[msg->distances[i].anthor_id].y  = anthorPoseMap[msg->distances[i].anthor_id].y;
-    // }
-    double estimated_x, estimated_y;
-
-    if (calculate_pos_robust_ransac(landmarks, distances, 5, &estimated_x, &estimated_y))
+    if (CALCULATE_SUCCESS == calculate_pos_robust_ransac(anthorPoseMap_, uwbDistance, estimatedRes))
     {
-        RCLCPP_INFO(this->get_logger(), "uwb location res: x: %f, y: %f", estimated_x, estimated_y);
+        RCLCPP_INFO(this->get_logger(), "uwb location res: x: %f, y: %f", estimatedRes.x, estimatedRes.y);
     }
     else
     {
@@ -86,6 +76,7 @@ void UWBLocate::load_anchors_pos()
 
         // RCLCPP_INFO(this->get_logger(), "load anthor id: %d position:%f %f %f", id, p.x, p.y, p.z);
         anthorPoseMap[id] = p;
+
         RCLCPP_INFO(this->get_logger(), "load anthor id: %d position:%f %f %f", id, anthorPoseMap[id].x, anthorPoseMap[id].y, anthorPoseMap[id].z);
         anthor = anthor->NextSiblingElement();
     }
