@@ -24,7 +24,7 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(nav_msgs REQUIRED)
-
+find_package(geometry_msgs REQUIRED)
 find_package(uwb_interfaces REQUIRED)
 
 find_package( PkgConfig REQUIRED)
