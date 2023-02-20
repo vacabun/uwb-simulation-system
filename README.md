@@ -1,2 +1,2 @@
 # uwb_sim
-uwb simulation on ROS2 Foxy
+uwb simulation on ROS2 Foxy.
