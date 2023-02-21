@@ -15,10 +15,10 @@
 #include "uwb_interfaces/msg/uwb_location_data.hpp"
 #include "uwb_interfaces/msg/uwb_data.hpp"
 
-class UWBLocate : public rclcpp::Node
+class UWBLocation : public rclcpp::Node
 {
 public:
-    UWBLocate();
+    UWBLocation();
 
 private:
     void topic_callback(const uwb_interfaces::msg::UWBData::SharedPtr msg);

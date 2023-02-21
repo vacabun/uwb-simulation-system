@@ -1,4 +1,4 @@
-#include "ransac_locator.hpp"
+#include "ransac_locator/ransac_locator.hpp"
 
 double angle_normalize(double angle)
 {

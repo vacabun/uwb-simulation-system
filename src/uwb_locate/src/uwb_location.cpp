@@ -1,19 +1,19 @@
-#include "uwb_locate.hpp"
+#include "uwb_location.hpp"
 
-UWBLocate::UWBLocate() : Node("uwb_locate")
+UWBLocation::UWBLocation() : Node("uwb_location")
 {
     this->load_anchors_pos();
 
     subscription_ = this->create_subscription<uwb_interfaces::msg::UWBData>(
-        "/uwbData", 10, std::bind(&UWBLocate::topic_callback, this, std::placeholders::_1));
+        "/uwbData", 10, std::bind(&UWBLocation::topic_callback, this, std::placeholders::_1));
 
     msgPublisher_ = this->create_publisher<uwb_interfaces::msg::UWBLocationData>("uwbLocationRes", 10);
 }
 
-void UWBLocate::topic_callback(const uwb_interfaces::msg::UWBData::SharedPtr msg)
+void UWBLocation::topic_callback(const uwb_interfaces::msg::UWBData::SharedPtr msg)
 {
 
-    int64_t robotId = msg->robot_id;
+    std::string labelName = msg->label_name;
 
     std::unordered_map<int, double> uwbDistance;
     for (long unsigned int i = 0; i < msg->distances.size(); i++)
@@ -26,16 +26,18 @@ void UWBLocate::topic_callback(const uwb_interfaces::msg::UWBData::SharedPtr msg
     calState = calculate_pos_robust_ransac(anthorPoseMap, uwbDistance, estimatedRes);
     if (calState == CALCULATE_SUCCESS)
     {
-        RCLCPP_INFO(this->get_logger(), "uwb location success. res: x: %f, y: %f", calState, estimatedRes.x, estimatedRes.y);
+        RCLCPP_INFO(this->get_logger(), "label: %s uwb location success. res: x: %f, y: %f", 
+        labelName.c_str(), estimatedRes.x, estimatedRes.y);
     }
     else
     {
-        RCLCPP_INFO(this->get_logger(), "uwb location failed (type: %d). res: x: %f, y: %f", calState, estimatedRes.x, estimatedRes.y);
+        RCLCPP_INFO(this->get_logger(), "label: %s uwb location failed (type: %d). res: x: %f, y: %f", 
+        labelName.c_str(), estimatedRes.x, estimatedRes.y);
     }
 
     uwb_interfaces::msg::UWBLocationData data;
 
-    data.set__robot_id(robotId);
+    data.set__label_name(labelName);
 
     data.set__x(estimatedRes.x);
     data.set__y(estimatedRes.y);
@@ -43,9 +45,9 @@ void UWBLocate::topic_callback(const uwb_interfaces::msg::UWBData::SharedPtr msg
     msgPublisher_->publish(data);
 }
 
-void UWBLocate::load_anchors_pos()
+void UWBLocation::load_anchors_pos()
 {
-    std::string packageShareDirectory = ament_index_cpp::get_package_share_directory("uwb_location");
+    std::string packageShareDirectory = ament_index_cpp::get_package_share_directory("uwb_locate");
 
     std::string anthorConfigFilePath = packageShareDirectory + "/config/anthor.xml";
 

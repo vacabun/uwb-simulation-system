@@ -21,12 +21,7 @@ find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(uwb_interfaces REQUIRED)
-
 find_package(gz-transport12 QUIET REQUIRED OPTIONAL_COMPONENTS log)
-
-set(GZ_TRANSPORT_VER ${gz-transport12_VERSION_MAJOR})
-
-
 
 add_executable(uwb_simulation 
   src/uwb_simulation_main.cpp 
