@@ -35,26 +35,26 @@ void UWBSimulation::load_config()
 {
     std::string packageShareDirectory = ament_index_cpp::get_package_share_directory("uwb_sim");
 
-    std::string anthorConfigFilePath = packageShareDirectory + "/config/anthor.xml";
+    std::string anchorConfigFilePath = packageShareDirectory + "/config/anchor.xml";
 
-    tinyxml2::XMLDocument anthorDoc;
+    tinyxml2::XMLDocument anchorDoc;
 
-    if (anthorDoc.LoadFile(anthorConfigFilePath.c_str()) != 0)
+    if (anchorDoc.LoadFile(anchorConfigFilePath.c_str()) != 0)
     {
-        RCLCPP_INFO(this->get_logger(), "load anthor config file failed.");
+        RCLCPP_INFO(this->get_logger(), "load anchor config file failed.");
     }
     else
     {
-        RCLCPP_INFO(this->get_logger(), "load anthor config file successed.");
+        RCLCPP_INFO(this->get_logger(), "load anchor config file successed.");
     }
 
-    tinyxml2::XMLElement *anthor = anthorDoc.RootElement()->FirstChildElement("anthor");
+    tinyxml2::XMLElement *anchor = anchorDoc.RootElement()->FirstChildElement("anchor");
 
-    while (anthor)
+    while (anchor)
     {
-        int id = atoi(anthor->FirstAttribute()->Value());
+        int id = atoi(anchor->FirstAttribute()->Value());
 
-        tinyxml2::XMLElement *attr = anthor->FirstChildElement();
+        tinyxml2::XMLElement *attr = anchor->FirstChildElement();
 
         geometry_msgs::msg::Point p;
 
@@ -64,9 +64,9 @@ void UWBSimulation::load_config()
         attr = attr->NextSiblingElement();
         p.set__z(std::stod(attr->GetText()));
 
-        RCLCPP_INFO(this->get_logger(), "load anthor id: %d position:%f %f %f", id, p.x, p.y, p.z);
-        anthorPoseMap[id] = p;
-        anthor = anthor->NextSiblingElement();
+        RCLCPP_INFO(this->get_logger(), "load anchor id: %d position:%f %f %f", id, p.x, p.y, p.z);
+        anchorPoseMap[id] = p;
+        anchor = anchor->NextSiblingElement();
     }
 }
 
@@ -74,14 +74,14 @@ void UWBSimulation::uwb_simulate(double x, double y, double z)
 {
     std::unordered_map<int, double> realDistance;
 
-    for (auto it : anthorPoseMap)
+    for (auto it : anchorPoseMap)
     {
         int id = it.first;
-        geometry_msgs::msg::Point anthorPose = it.second;
+        geometry_msgs::msg::Point anchorPose = it.second;
         realDistance[id] = sqrtf(
-            pow((x - anthorPose.x), 2) +
-            pow((y - anthorPose.y), 2) +
-            pow((z - anthorPose.z), 2));
+            pow((x - anchorPose.x), 2) +
+            pow((y - anchorPose.y), 2) +
+            pow((z - anchorPose.z), 2));
     }
 
     std::unordered_map<int, double> simDistance;
@@ -92,7 +92,7 @@ void UWBSimulation::uwb_simulate(double x, double y, double z)
         int id = it.first;
         simDistance[id] = realDistance[id] + distribution_normal(tandomGenerator);
 
-        RCLCPP_INFO(this->get_logger(), "label name: %s anthor Id: %d real distance : %f sim distance : %f.",
+        RCLCPP_INFO(this->get_logger(), "label name: %s anchor Id: %d real distance : %f sim distance : %f.",
                     labelName.c_str(), id, realDistance[id], simDistance[id]);
     }
 
@@ -102,12 +102,12 @@ void UWBSimulation::uwb_simulate(double x, double y, double z)
 
     for (auto it : realDistance)
     {
-        int id = it.first; // anthor id
+        int id = it.first; // anchor id
 
         uwb_interfaces::msg::UWBDistance distance;
-        distance.anthor_id = id;
+        distance.anchor_id = id;
         distance.label_name = msg.label_name;
-        distance.distance = simDistance[distance.anthor_id];
+        distance.distance = simDistance[distance.anchor_id];
 
         msg.distances.push_back(distance);
     }

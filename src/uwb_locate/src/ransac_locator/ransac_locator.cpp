@@ -10,7 +10,7 @@ bool fequal(double f1, double f2)
     return fabs(f1 - f2) < EPS;
 }
 
-LOCATOR_RETURN calculate_pos_robust_ransac(std::unordered_map<int, Position3D> anthorPoseMap,
+LOCATOR_RETURN calculate_pos_robust_ransac(std::unordered_map<int, Position3D> anchorPoseMap,
                                            std::unordered_map<int, double> distances,
                                            Position3D &res)
 {
@@ -26,7 +26,7 @@ LOCATOR_RETURN calculate_pos_robust_ransac(std::unordered_map<int, Position3D> a
     else if (distances.size() <= RANSAC_LEAST_CNT)
     {
         // effective_landmark_num too small, calculate all.
-        return calculate_pos_for_all_(anthorPoseMap, distances, res);
+        return calculate_pos_for_all_(anchorPoseMap, distances, res);
     }
     else
     {
@@ -52,7 +52,7 @@ LOCATOR_RETURN calculate_pos_robust_ransac(std::unordered_map<int, Position3D> a
 
             // calculate pos based on the chosen sample
             Position3D res_temp;
-            if (CALCULATE_SUCCESS == calculate_pos_with_index_(anthorPoseMap, distances, sample_indexes, res))
+            if (CALCULATE_SUCCESS == calculate_pos_with_index_(anchorPoseMap, distances, sample_indexes, res))
             {
 
                 double total_residual = DBL_MAX;
@@ -60,7 +60,7 @@ LOCATOR_RETURN calculate_pos_robust_ransac(std::unordered_map<int, Position3D> a
 
                 std::vector<int> all_fit_indexes;
 
-                get_all_fit_indexes_(anthorPoseMap, distances, sample_indexes, res_temp, threshold, all_fit_indexes, total_residual);
+                get_all_fit_indexes_(anchorPoseMap, distances, sample_indexes, res_temp, threshold, all_fit_indexes, total_residual);
 
                 if (fit_success == false ||
                     all_fit_indexes.size() > all_fit_indexes_best.size() ||
@@ -82,14 +82,14 @@ LOCATOR_RETURN calculate_pos_robust_ransac(std::unordered_map<int, Position3D> a
             if (ENABLE_RANSAC_REFINE && all_fit_indexes_best.size() >= RANSAC_LEAST_CNT)
             {
                 Position3D res_temp;
-                if (CALCULATE_SUCCESS == calculate_pos_with_index_(anthorPoseMap, distances, all_fit_indexes_best, res_temp))
+                if (CALCULATE_SUCCESS == calculate_pos_with_index_(anchorPoseMap, distances, all_fit_indexes_best, res_temp))
                 {
                     double residual_refined = 0.0;
 
                     for (int i = 0; i < all_fit_indexes_best.size(); i++)
                     {
-                        double estimated_distance = sqrt(pow((anthorPoseMap[all_fit_indexes_best[i]].x - res.x), 2) +
-                                                         pow((anthorPoseMap[all_fit_indexes_best[i]].y - res.y),
+                        double estimated_distance = sqrt(pow((anchorPoseMap[all_fit_indexes_best[i]].x - res.x), 2) +
+                                                         pow((anchorPoseMap[all_fit_indexes_best[i]].y - res.y),
                                                              2));
                         double difference_of_distances = fabs(distances[all_fit_indexes_best[i]] - estimated_distance);
                         residual_refined += difference_of_distances * difference_of_distances;
@@ -114,7 +114,7 @@ LOCATOR_RETURN calculate_pos_robust_ransac(std::unordered_map<int, Position3D> a
     }
 }
 
-LOCATOR_RETURN calculate_pos_for_all_(std::unordered_map<int, Position3D> anthorPoseMap,
+LOCATOR_RETURN calculate_pos_for_all_(std::unordered_map<int, Position3D> anchorPoseMap,
                                       std::unordered_map<int, double> distances,
                                       Position3D &res)
 {
@@ -125,18 +125,18 @@ LOCATOR_RETURN calculate_pos_for_all_(std::unordered_map<int, Position3D> anthor
         effective_landmark_indexes.push_back(it.first);
     }
 
-    return calculate_pos_with_index_(anthorPoseMap, distances, effective_landmark_indexes, res);
+    return calculate_pos_with_index_(anchorPoseMap, distances, effective_landmark_indexes, res);
 }
 
-LOCATOR_RETURN calculate_pos_with_index_(std::unordered_map<int, Position3D> anthorPoseMap,
+LOCATOR_RETURN calculate_pos_with_index_(std::unordered_map<int, Position3D> anchorPoseMap,
                                          std::unordered_map<int, double> distances,
                                          std::vector<int> effective_landmark_indexes,
                                          Position3D &res)
 {
-    if (is_landmarks_in_one_line(anthorPoseMap, effective_landmark_indexes))
+    if (is_landmarks_in_one_line(anchorPoseMap, effective_landmark_indexes))
     {
         // all landmarks in one line, cannot locate the position.
-        return ANTHOR_ON_ONE_LINE;
+        return anchor_ON_ONE_LINE;
     }
 
     int matrix_row_num = effective_landmark_indexes.size() - 1;
@@ -158,12 +158,12 @@ LOCATOR_RETURN calculate_pos_with_index_(std::unordered_map<int, Position3D> ant
     for (int i = 0; i < effective_landmark_indexes.size() - 1; i++)
     {
         int index_i = effective_landmark_indexes[i];
-        gsl_matrix_set(A, i, 0, (anthorPoseMap[index_i].x - anthorPoseMap[index_last].x) * 2);
-        gsl_matrix_set(A, i, 1, (anthorPoseMap[index_i].y - anthorPoseMap[index_last].y) * 2);
-        double bi = anthorPoseMap[index_i].x * anthorPoseMap[index_i].x -
-                    anthorPoseMap[index_last].x * anthorPoseMap[index_last].x +
-                    anthorPoseMap[index_i].y * anthorPoseMap[index_i].y -
-                    anthorPoseMap[index_last].y * anthorPoseMap[index_last].y +
+        gsl_matrix_set(A, i, 0, (anchorPoseMap[index_i].x - anchorPoseMap[index_last].x) * 2);
+        gsl_matrix_set(A, i, 1, (anchorPoseMap[index_i].y - anchorPoseMap[index_last].y) * 2);
+        double bi = anchorPoseMap[index_i].x * anchorPoseMap[index_i].x -
+                    anchorPoseMap[index_last].x * anchorPoseMap[index_last].x +
+                    anchorPoseMap[index_i].y * anchorPoseMap[index_i].y -
+                    anchorPoseMap[index_last].y * anchorPoseMap[index_last].y +
                     distances[index_last] * distances[index_last] -
                     distances[index_i] * distances[index_i];
         gsl_vector_set(b, i, bi);
@@ -198,21 +198,21 @@ LOCATOR_RETURN calculate_pos_with_index_(std::unordered_map<int, Position3D> ant
 }
 
 bool
-is_landmarks_in_one_line(std::unordered_map<int, Position3D> anthorPoseMap,
+is_landmarks_in_one_line(std::unordered_map<int, Position3D> anchorPoseMap,
                          std::vector<int> effective_landmark_indexes)
 {
     int index_0 = effective_landmark_indexes[0];
 
     int index_last = effective_landmark_indexes[effective_landmark_indexes.size() - 1];
 
-    double angle_0 = angle_normalize(atan2(anthorPoseMap[index_0].y - anthorPoseMap[index_last].y,
-                                           anthorPoseMap[index_0].x - anthorPoseMap[index_last].x));
+    double angle_0 = angle_normalize(atan2(anchorPoseMap[index_0].y - anchorPoseMap[index_last].y,
+                                           anchorPoseMap[index_0].x - anchorPoseMap[index_last].x));
 
     for (int i = 1; i < effective_landmark_indexes.size() - 1; i++)
     {
         int index_i = effective_landmark_indexes[i];
-        double angle_i = angle_normalize(atan2(anthorPoseMap[index_i].y - anthorPoseMap[index_last].y,
-                                               anthorPoseMap[index_i].x - anthorPoseMap[index_last].x));
+        double angle_i = angle_normalize(atan2(anchorPoseMap[index_i].y - anchorPoseMap[index_last].y,
+                                               anchorPoseMap[index_i].x - anchorPoseMap[index_last].x));
         if (!fequal(angle_0, angle_i))
         {
             return false;
@@ -239,7 +239,7 @@ bool get_sample_indexes_(std::vector<int> indexes,
     return true;
 }
 
-void get_all_fit_indexes_(std::unordered_map<int, Position3D> anthorPoseMap,
+void get_all_fit_indexes_(std::unordered_map<int, Position3D> anchorPoseMap,
                           std::unordered_map<int, double> distances,
                           std::vector<int> sample_indexes,
                           Position3D p,
@@ -254,7 +254,7 @@ void get_all_fit_indexes_(std::unordered_map<int, Position3D> anthorPoseMap,
     {
         int id = it.first;
 
-        double estimated_distance = sqrt(pow((anthorPoseMap[id].x - p.x), 2) + pow((anthorPoseMap[id].y - p.y), 2));
+        double estimated_distance = sqrt(pow((anchorPoseMap[id].x - p.x), 2) + pow((anchorPoseMap[id].y - p.y), 2));
         double difference_of_distances = fabs(distances[id] - estimated_distance);
         if (difference_of_distances < threshold)
         {

@@ -29,9 +29,9 @@ private:
 
     rclcpp::Publisher<uwb_interfaces::msg::UWBLocationData>::SharedPtr msgPublisher_;
     
-    // std::unordered_map<int, geometry_msgs::msg::Point> anthorPoseMap;
+    // std::unordered_map<int, geometry_msgs::msg::Point> anchorPoseMap;
 
-    std::unordered_map<int, Position3D> anthorPoseMap;
+    std::unordered_map<int, Position3D> anchorPoseMap;
 
 };
 

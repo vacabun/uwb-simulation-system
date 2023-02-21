@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<anthors>
-	<anthor id = "1">
+<anchors>
+	<anchor id = "1">
         <x>0</x>
         <y>0</y>
         <z>0</z>
-    </anthor>
-    <anthor id = "2">
+    </anchor>
+    <anchor id = "2">
         <x>0.0</x>
         <y>10.0</y>
         <z>0.0</z>
-    </anthor>
-    <anthor id = "3">
+    </anchor>
+    <anchor id = "3">
         <x>10.0</x>
         <y>0.0</y>
         <z>0.0</z>
-    </anthor>
-    <anthor id = "4">
+    </anchor>
+    <anchor id = "4">
         <x>10.0</x>
         <y>10.0</y>
         <z>0.0</z>
-    </anthor>
-    <anthor id = "5">
+    </anchor>
+    <anchor id = "5">
         <x>15.0</x>
         <y>10.0</y>
         <z>0.0</z>
-    </anthor>
-    <anthor id = "6">
+    </anchor>
+    <anchor id = "6">
         <x>15.0</x>
         <y>15.0</y>
         <z>0.0</z>
-    </anthor>
-    <anthor id = "7">
+    </anchor>
+    <anchor id = "7">
         <x>20.0</x>
         <y>15.0</y>
         <z>0.0</z>
-    </anthor>
-    <anthor id = "6">
+    </anchor>
+    <anchor id = "6">
         <x>15.0</x>
         <y>20.0</y>
         <z>0.0</z>
-    </anthor>
+    </anchor>
 
-</anthors>
+</anchors>

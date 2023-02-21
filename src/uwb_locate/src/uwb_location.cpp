@@ -18,12 +18,12 @@ void UWBLocation::topic_callback(const uwb_interfaces::msg::UWBData::SharedPtr m
     std::unordered_map<int, double> uwbDistance;
     for (long unsigned int i = 0; i < msg->distances.size(); i++)
     {
-        uwbDistance[msg->distances[i].anthor_id] = msg->distances[i].distance;
+        uwbDistance[msg->distances[i].anchor_id] = msg->distances[i].distance;
     }
 
     Position3D estimatedRes;
     LOCATOR_RETURN calState;
-    calState = calculate_pos_robust_ransac(anthorPoseMap, uwbDistance, estimatedRes);
+    calState = calculate_pos_robust_ransac(anchorPoseMap, uwbDistance, estimatedRes);
     if (calState == CALCULATE_SUCCESS)
     {
         RCLCPP_INFO(this->get_logger(), "label: %s uwb location success. res: x: %f, y: %f", 
@@ -32,7 +32,7 @@ void UWBLocation::topic_callback(const uwb_interfaces::msg::UWBData::SharedPtr m
     else
     {
         RCLCPP_INFO(this->get_logger(), "label: %s uwb location failed (type: %d). res: x: %f, y: %f", 
-        labelName.c_str(), estimatedRes.x, estimatedRes.y);
+        labelName.c_str(),calState, estimatedRes.x, estimatedRes.y);
     }
 
     uwb_interfaces::msg::UWBLocationData data;
@@ -49,26 +49,26 @@ void UWBLocation::load_anchors_pos()
 {
     std::string packageShareDirectory = ament_index_cpp::get_package_share_directory("uwb_locate");
 
-    std::string anthorConfigFilePath = packageShareDirectory + "/config/anthor.xml";
+    std::string anchorConfigFilePath = packageShareDirectory + "/config/anchor.xml";
 
     tinyxml2::XMLDocument doc;
 
-    if (doc.LoadFile(anthorConfigFilePath.c_str()) != 0)
+    if (doc.LoadFile(anchorConfigFilePath.c_str()) != 0)
     {
-        RCLCPP_INFO(this->get_logger(), "load anthor config file failed.");
+        RCLCPP_INFO(this->get_logger(), "load anchor config file failed.");
     }
     else
     {
-        RCLCPP_INFO(this->get_logger(), "load anthor config file successed.");
+        RCLCPP_INFO(this->get_logger(), "load anchor config file successed.");
     }
 
-    tinyxml2::XMLElement *anthor = doc.RootElement()->FirstChildElement("anthor");
+    tinyxml2::XMLElement *anchor = doc.RootElement()->FirstChildElement("anchor");
 
-    while (anthor)
+    while (anchor)
     {
-        int id = atoi(anthor->FirstAttribute()->Value());
+        int id = atoi(anchor->FirstAttribute()->Value());
 
-        tinyxml2::XMLElement *attr = anthor->FirstChildElement();
+        tinyxml2::XMLElement *attr = anchor->FirstChildElement();
 
         // geometry_msgs::msg::Point p;
         // p.set__x(std::stod(attr->GetText()));
@@ -84,11 +84,11 @@ void UWBLocation::load_anchors_pos()
         attr = attr->NextSiblingElement();
         p.z = std::stod(attr->GetText());
 
-        anthorPoseMap[id] = p;
+        anchorPoseMap[id] = p;
 
-        RCLCPP_INFO(this->get_logger(), "load anthor id: %d position:%f %f %f", id, anthorPoseMap[id].x, anthorPoseMap[id].y, anthorPoseMap[id].z);
+        RCLCPP_INFO(this->get_logger(), "load anchor id: %d position:%f %f %f", id, anchorPoseMap[id].x, anchorPoseMap[id].y, anchorPoseMap[id].z);
 
-        anthor = anthor->NextSiblingElement();
+        anchor = anchor->NextSiblingElement();
     }
 }
 

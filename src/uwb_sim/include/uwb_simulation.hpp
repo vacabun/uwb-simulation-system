@@ -29,7 +29,7 @@ private:
 
     std::string target_frame_;
 
-    std::unordered_map<int, geometry_msgs::msg::Point> anthorPoseMap;
+    std::unordered_map<int, geometry_msgs::msg::Point> anchorPoseMap;
 
     std::default_random_engine tandomGenerator;
 
