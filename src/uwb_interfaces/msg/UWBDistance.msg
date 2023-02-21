@@ -1,3 +1,3 @@
 int64 anthor_id
-int64 robot_id
+string label_name
 float64 distance

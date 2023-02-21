@@ -2,30 +2,44 @@
 
 UWBSimulation::UWBSimulation() : Node("uwb_simulation")
 {
-    this->load_anchors_pos();
+    this->load_config();
+    this->declare_parameter("label_name", "x500_1");
 
-    subscription_ = this->create_subscription<nav_msgs::msg::Odometry>(
-        "/odom", 10, std::bind(&UWBSimulation::topic_callback, this, std::placeholders::_1));
+    labelName =
+        this->get_parameter("label_name").get_parameter_value().get<std::string>();
+    RCLCPP_INFO(this->get_logger(), "label_name: %s", labelName.c_str());
+
+    std::string subscribeTopic = "/model/" + labelName + "/odometry";
+
+    RCLCPP_INFO(this->get_logger(), "subscribe topic : %s", subscribeTopic.c_str());
+
+    if (!subscribeNode.Subscribe(subscribeTopic, &UWBSimulation::topic_callback, this))
+    {
+        RCLCPP_ERROR(this->get_logger(), "Error subscribing to topic [%s].", subscribeTopic.c_str());
+    }
 
     msgPublisher_ = this->create_publisher<uwb_interfaces::msg::UWBData>("uwbData", 10);
 }
 
-void UWBSimulation::topic_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
+void UWBSimulation::topic_callback(const gz::msgs::Odometry &_msg)
 {
-    robotPose = msg->pose.pose.position;
-    RCLCPP_INFO(this->get_logger(), "position: %f %f %f", robotPose.x, robotPose.y, robotPose.z);
-    this->uwb_simulate();
+    double x = _msg.pose().position().x();
+    double y = _msg.pose().position().y();
+    double z = _msg.pose().position().z();
+
+    RCLCPP_INFO(this->get_logger(), "position: %f %f %f", x, y, z);
+    this->uwb_simulate(x, y, z);
 }
 
-void UWBSimulation::load_anchors_pos()
+void UWBSimulation::load_config()
 {
     std::string packageShareDirectory = ament_index_cpp::get_package_share_directory("uwb_sim");
 
     std::string anthorConfigFilePath = packageShareDirectory + "/config/anthor.xml";
 
-    tinyxml2::XMLDocument doc;
+    tinyxml2::XMLDocument anthorDoc;
 
-    if (doc.LoadFile(anthorConfigFilePath.c_str()) != 0)
+    if (anthorDoc.LoadFile(anthorConfigFilePath.c_str()) != 0)
     {
         RCLCPP_INFO(this->get_logger(), "load anthor config file failed.");
     }
@@ -34,7 +48,7 @@ void UWBSimulation::load_anchors_pos()
         RCLCPP_INFO(this->get_logger(), "load anthor config file successed.");
     }
 
-    tinyxml2::XMLElement *anthor = doc.RootElement()->FirstChildElement("anthor");
+    tinyxml2::XMLElement *anthor = anthorDoc.RootElement()->FirstChildElement("anthor");
 
     while (anthor)
     {
@@ -56,7 +70,7 @@ void UWBSimulation::load_anchors_pos()
     }
 }
 
-void UWBSimulation::uwb_simulate()
+void UWBSimulation::uwb_simulate(double x, double y, double z)
 {
     std::unordered_map<int, double> realDistance;
 
@@ -65,9 +79,9 @@ void UWBSimulation::uwb_simulate()
         int id = it.first;
         geometry_msgs::msg::Point anthorPose = it.second;
         realDistance[id] = sqrtf(
-            pow((robotPose.x - anthorPose.x), 2) +
-            pow((robotPose.y - anthorPose.y), 2) +
-            pow((robotPose.z - anthorPose.z), 2));
+            pow((x - anthorPose.x), 2) +
+            pow((y - anthorPose.y), 2) +
+            pow((z - anthorPose.z), 2));
     }
 
     std::unordered_map<int, double> simDistance;
@@ -78,29 +92,25 @@ void UWBSimulation::uwb_simulate()
         int id = it.first;
         simDistance[id] = realDistance[id] + distribution_normal(tandomGenerator);
 
-        // RCLCPP_INFO(this->get_logger(), "Id: %d real distance : %f.", id, realDistance[id]);
-        // RCLCPP_INFO(this->get_logger(), "Id: %d sim distance  : %f.", id, simDistance[id]);
+        RCLCPP_INFO(this->get_logger(), "label name: %s anthor Id: %d real distance : %f sim distance : %f.",
+                    labelName.c_str(), id, realDistance[id], simDistance[id]);
     }
 
-    
     uwb_interfaces::msg::UWBData msg;
 
-    int robotId = 0;
-
-    msg.robot_id = robotId;
+    msg.label_name = labelName;
 
     for (auto it : realDistance)
     {
-        int id = it.first; //anthor id
+        int id = it.first; // anthor id
 
         uwb_interfaces::msg::UWBDistance distance;
         distance.anthor_id = id;
-        distance.robot_id = msg.robot_id;
+        distance.label_name = msg.label_name;
         distance.distance = simDistance[distance.anthor_id];
-        
+
         msg.distances.push_back(distance);
     }
-    
-    msgPublisher_->publish(msg);
 
+    msgPublisher_->publish(msg);
 }
