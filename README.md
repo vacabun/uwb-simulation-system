@@ -137,7 +137,7 @@ distances:
 ---
 ```
 
-### UWB Locate
+### 3 UWB Locate
 
 install the GSL libraries.
 
