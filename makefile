@@ -1,17 +1,17 @@
 all:
 	colcon build
 
-	mkdir -p $(CURDIR)/install/uwb_sim/share/uwb_sim/config/
-	cp $(CURDIR)/config/anchor.xml $(CURDIR)/install/uwb_sim/share/uwb_sim/config/anchor.xml
+	mkdir -p $(CURDIR)/install/uwb_simulation/share/uwb_simulation/config/
+	cp $(CURDIR)/config/anchor.xml $(CURDIR)/install/uwb_simulation/share/uwb_simulation/config/anchor.xml
 
 	mkdir -p $(CURDIR)/install/uwb_location/share/uwb_location/config/
 	cp $(CURDIR)/config/anchor.xml $(CURDIR)/install/uwb_location/share/uwb_location/config/anchor.xml
 
-sim:
-	colcon build --packages-select uwb_interfaces uwb_sim
+simulation:
+	colcon build --packages-select uwb_interfaces uwb_simulation
 
-	mkdir -p $(CURDIR)/install/uwb_sim/share/uwb_sim/config/
-	cp $(CURDIR)/config/anchor.xml $(CURDIR)/install/uwb_sim/share/uwb_sim/config/anchor.xml
+	mkdir -p $(CURDIR)/install/uwb_simulation/share/uwb_simulation/config/
+	cp $(CURDIR)/config/anchor.xml $(CURDIR)/install/uwb_simulation/share/uwb_simulation/config/anchor.xml
 
 interfaces:
 	colcon build --packages-select uwb_interfaces

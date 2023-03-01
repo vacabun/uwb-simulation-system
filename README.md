@@ -27,9 +27,9 @@ Insert the plugin `gz-sim-odometry-publisher-system` in gazebo model SDF file.
 ```
 The odometry data will publisher to the gazebo topic.
 
-Such as `/model/x500_1/odometry`.
+Such as `/model/x500_0/odometry`.
 
-You can use `gz topic -e -t /model/x500_2/odometry` to check out the msgs.
+You can use `gz topic -e -t /model/x500_0/odometry` to check out the msgs.
 
 ```
 header {
@@ -84,28 +84,28 @@ Run the UWB Simulation program.
 ```
 source /opt/ros/humble/setup.sh
 source install/setup.sh
-ros2 run uwb_sim uwb_simulation
+ros2 run uwb_simulation uwb_simulation_node
 ```
 
-The defult label name is `x500_1`.
+The defult label name is `x500_0`.
 
 You can use parameter to assign.
 
 ```
-ros2 run uwb_sim uwb_simulation --ros-args -p label_name:=x500_2
+ros2 run uwb_simulation uwb_simulation_node --ros-args -p label_name:=x500_1
 ```
 
 Program will output real distance and sim distance.
 
 ```
-[INFO] [1676978364.181314890] [uwb_simulation]: position: 0.000000 0.000000 0.227000
-[INFO] [1676978364.181387268] [uwb_simulation]: label name: x500_2 anchor Id: 1 real distance : 0.227000 sim distance : 0.316312.
-[INFO] [1676978364.181435666] [uwb_simulation]: label name: x500_2 anchor Id: 2 real distance : 10.002576 sim distance : 10.048888.
-[INFO] [1676978364.181452126] [uwb_simulation]: label name: x500_2 anchor Id: 3 real distance : 10.002576 sim distance : 10.121775.
-[INFO] [1676978364.181464859] [uwb_simulation]: label name: x500_2 anchor Id: 4 real distance : 14.143957 sim distance : 14.061946.
-[INFO] [1676978364.181477146] [uwb_simulation]: label name: x500_2 anchor Id: 5 real distance : 18.029184 sim distance : 18.150420.
-[INFO] [1676978364.181489173] [uwb_simulation]: label name: x500_2 anchor Id: 6 real distance : 25.001030 sim distance : 24.788486.
-[INFO] [1676978364.181501873] [uwb_simulation]: label name: x500_2 anchor Id: 7 real distance : 25.001030 sim distance : 25.150981.
+[INFO] [1676978364.181314890] [uwb_simulation_node]: position: 0.000000 0.000000 0.227000
+[INFO] [1676978364.181387268] [uwb_simulation_node]: label name: x500_2 anchor Id: 1 real distance : 0.227000 sim distance : 0.316312.
+[INFO] [1676978364.181435666] [uwb_simulation_node]: label name: x500_2 anchor Id: 2 real distance : 10.002576 sim distance : 10.048888.
+[INFO] [1676978364.181452126] [uwb_simulation_node]: label name: x500_2 anchor Id: 3 real distance : 10.002576 sim distance : 10.121775.
+[INFO] [1676978364.181464859] [uwb_simulation_node]: label name: x500_2 anchor Id: 4 real distance : 14.143957 sim distance : 14.061946.
+[INFO] [1676978364.181477146] [uwb_simulation_node]: label name: x500_2 anchor Id: 5 real distance : 18.029184 sim distance : 18.150420.
+[INFO] [1676978364.181489173] [uwb_simulation_node]: label name: x500_2 anchor Id: 6 real distance : 25.001030 sim distance : 24.788486.
+[INFO] [1676978364.181501873] [uwb_simulation_node]: label name: x500_2 anchor Id: 7 real distance : 25.001030 sim distance : 25.150981.
 ```
 
 You can use `ros2 topic echo /uwbData` to check out the msgs.
