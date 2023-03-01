@@ -1,6 +1,17 @@
 # uwb_sim
 UWB Simulation on ROS2 Humble and Gazebo Garden.
 
+## Install
+
+Install ROS2 Humble and Gazebo Garden.
+
+Download th code.
+
+```
+git clone https://github.com/vacabun/uwb-simulation-system.git
+git submodule update --init --recursive
+```
+
 ## How to Use
 
 ### 1 Gazebo Plugin
