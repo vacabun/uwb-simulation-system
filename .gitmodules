@@ -1,3 +1,9 @@
 [submodule "src/uwb_simulation"]
 	path = src/uwb_simulation
 	url = https://github.com/vacabun/uwb_simulation.git
+[submodule "src/uwb_locate"]
+	path = src/uwb_locate
+	url = https://github.com/vacabun/uwb_locate.git
+[submodule "src/uwb_interfaces"]
+	path = src/uwb_interfaces
+	url = https://github.com/vacabun/uwb_interfaces.git
