@@ -16,16 +16,16 @@
         <z>0.0</z>
     </anchor>
     <anchor id = "4">
-        <x>10.0</x>
-        <y>10.0</y>
-        <z>0.0</z>
+        <x>0.0</x>
+        <y>0.0</y>
+        <z>2.0</z>
     </anchor>
-    <anchor id = "5">
+    <!-- <anchor id = "5">
         <x>15.0</x>
         <y>10.0</y>
-        <z>0.0</z>
-    </anchor>
-    <anchor id = "6">
+        <z>2.0</z>
+    </anchor> -->
+    <!-- <anchor id = "6">
         <x>15.0</x>
         <y>15.0</y>
         <z>0.0</z>
@@ -39,6 +39,6 @@
         <x>15.0</x>
         <y>20.0</y>
         <z>0.0</z>
-    </anchor>
+    </anchor> -->
 
 </anchors>

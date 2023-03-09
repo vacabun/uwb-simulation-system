@@ -4,8 +4,8 @@ all:
 	mkdir -p $(CURDIR)/install/uwb_simulation/share/uwb_simulation/config/
 	cp $(CURDIR)/config/anchor.xml $(CURDIR)/install/uwb_simulation/share/uwb_simulation/config/anchor.xml
 
-	mkdir -p $(CURDIR)/install/uwb_location/share/uwb_location/config/
-	cp $(CURDIR)/config/anchor.xml $(CURDIR)/install/uwb_location/share/uwb_location/config/anchor.xml
+	mkdir -p $(CURDIR)/install/uwb_locate/share/uwb_locate/config/
+	cp $(CURDIR)/config/anchor.xml $(CURDIR)/install/uwb_locate/share/uwb_locate/config/anchor.xml
 
 simulation:
 	colcon build --packages-select uwb_interfaces uwb_simulation
