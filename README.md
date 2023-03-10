@@ -1,4 +1,4 @@
-# uwb_sim
+# uwb-simulation-system
 UWB Simulation on ROS2 Humble and Gazebo Garden.
 
 ## Install
