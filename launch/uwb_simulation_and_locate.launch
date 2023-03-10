@@ -1,0 +1,35 @@
+<launch>
+    <!-- x500_0 -->
+    <group>
+        <arg name="id" default="0" />
+        <include file="$(find-pkg-share uwb_simulation)/launch/uwb_simulation.launch">
+            <arg name="namespace"
+                value="$(eval ' \'uwb_simulation_node_\' + \'$(var id)\' ')" />
+                <arg name="label_name"
+                value="$(eval ' \'x500_\' + \'$(var id)\' ')" />  
+        </include>
+        <include file="$(find-pkg-share uwb_locate)/launch/uwb_locate.launch">
+            <arg name="namespace"
+                value="$(eval ' \'uwb_locate_node_\' + \'$(var id)\' ')" />
+                <arg name="label_name"
+                value="$(eval ' \'x500_\' + \'$(var id)\' ')" />  
+        </include>
+    </group>
+    <!-- x500_1 -->
+    <group>
+        <arg name="id" default="1" />
+        <include file="$(find-pkg-share uwb_simulation)/launch/uwb_simulation.launch">
+            <arg name="namespace"
+                value="$(eval ' \'uwb_simulation_node_\' + \'$(var id)\' ')" />
+                <arg name="label_name"
+                value="$(eval ' \'x500_\' + \'$(var id)\' ')" />  
+        </include>
+        <include file="$(find-pkg-share uwb_locate)/launch/uwb_locate.launch">
+            <arg name="namespace"
+                value="$(eval ' \'uwb_locate_node_\' + \'$(var id)\' ')" />
+                <arg name="label_name"
+                value="$(eval ' \'x500_\' + \'$(var id)\' ')" />  
+        </include>
+    </group>
+</launch>
+    

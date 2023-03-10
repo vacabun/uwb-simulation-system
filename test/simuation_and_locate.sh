@@ -3,10 +3,9 @@ CURRENT_DIR=$(cd $(dirname $0); pwd)
 
 WS_DIR=$(cd $(dirname $0);cd ..; pwd)
 
-
-source $WS_DIR/install/setup.sh
 source /opt/ros/humble/setup.sh
+source $WS_DIR/install/setup.sh
 
-ros2 run uwb_locate uwb_location
+ros2 launch $WS_DIR/launch/uwb_simulation_and_locate.launch
 
 
